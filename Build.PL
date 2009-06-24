@@ -12,6 +12,7 @@ my $builder = Module::Build->new(
         'version'        => 0,
         'DBI'            => 0,
         'DBD::SQLite'    => 0,
+        'Sub::Install'    => 0,
     },
     add_to_cleanup      => [ 'Geo-IATA-*' ],
 );

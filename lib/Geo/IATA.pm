@@ -9,7 +9,7 @@ use Sub::Install qw(install_sub);
 
 use version;
 use vars '$VERSION';
-$VERSION = qv('0.0.1');
+$VERSION = qv('0.0.2');
 our $AUTOLOAD;
 
 sub new {
@@ -95,11 +95,11 @@ __END__
 
 =head1 NAME
 
-Geo::IATA - Lookup Airport Codes
+Geo::IATA - Search airports by iata, icao codes
 
 =head1 VERSION
 
-This document describes Geo::IATA version 0.0.1
+This document describes Geo::IATA version 0.0.2
 
 
 =head1 SYNOPSIS
