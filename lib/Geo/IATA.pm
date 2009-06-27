@@ -9,7 +9,7 @@ use Sub::Install qw(install_sub);
 
 use version;
 use vars '$VERSION';
-$VERSION = qv('0.0.2');
+$VERSION = qv('0.0.3');
 our $AUTOLOAD;
 
 sub new {
@@ -22,58 +22,58 @@ sub new {
        $db =~s{::}{/}gxms;
        $db =~s{$}{.pm}xms;
        ($path = $INC{$db}) =~ s{.pm$}{}xms;
-       $path=File::Spec->catfile($path, "iata_sqlite.db");
+       $path="iata_sqlite.db";
 
     }
     my $dbh = DBI->connect("dbi:SQLite:dbname=$path","","", {RaiseError => 1, unicode=> 1});
-return bless {dbh => $dbh}, $pkg;
+return bless {dbh => $dbh, dbname => $path}, $pkg;
 }
 
 sub AUTOLOAD { ## no critic qw(ClassHierarchies::ProhibitAutoloading Subroutines::RequireArgUnpacking)
     my $func = $AUTOLOAD;
     $func =~ s/.*:://xms;
 
-return unless grep {$func eq $_} qw( iata icao airport location );
-    no strict 'refs'; ## no critic 'TestingAndDebugging::ProhibitNoStrict'
+    if ( grep { $func eq $_ } qw( iata icao airport location ) ) {
 
-    install_sub({
-        code => sub {
-             my $self = shift;
-             my $arg  = shift;
-             my $sth  = $self->dbh->prepare("select * from iata where $func like ?");
-             $sth->execute($arg);
-             my $result = $sth->fetchall_arrayref( {} );
-             $sth->finish;
-         return $result;
-         }, 
-        into => ref $_[0],
-        as   => $func,
-    });
+        no strict 'refs';    ## no critic 'TestingAndDebugging::ProhibitNoStrict'
+
+        install_sub(
+            {   code => sub {
+                    my $self = shift;
+                    my $arg  = shift;
+                    my $sth  = $self->dbh->prepare("select * from iata where $func like ?");
+                    $sth->execute($arg);
+                    my $result = $sth->fetchall_arrayref( {} );
+                    $sth->finish;
+                return $result;
+                },
+                into => ref $_[0],
+                as   => $func,
+            }
+        );
     goto &$func;
-}
+    }
+    elsif ( $func =~ m/^(iata|icao|airport|location)2(iata|icao|airport|location)$/xms ) {
+        my $from = $1;
+        my $to   = $2;
+        no strict 'refs';    ## no critic 'TestingAndDebugging::ProhibitNoStrict'
 
-sub iata2icao {
-return shift->iata(shift)->[0]{icao};
-}
-
-sub icao2iata {
-return shift->icao(shift)->[0]{iata};
-}
-
-sub iata2airport {
-return shift->iata(shift)->[0]{airport};
-}
-
-sub icao2airport {
-return shift->icao(shift)->[0]{airport};
-}
-
-sub icao2location {
-return shift->icao(shift)->[0]{airport};
-}
-
-sub iata2location {
-return shift->iata(shift)->[0]{location};
+        install_sub(
+            {   code => sub {
+                    my $self = shift;
+                    my $arg  = shift;
+                    return $self->$from($arg)->[0]{$to};
+                },
+                into => ref $_[0],
+                as   => $func,
+            }
+        );
+    goto &$func;    
+    }
+    else {
+        croak "unknown subroutine $func";
+    }
+    return;
 }
 
 sub DESTROY {
@@ -99,8 +99,10 @@ Geo::IATA - Search airports by iata, icao codes
 
 =head1 VERSION
 
-This document describes Geo::IATA version 0.0.2
+This document describes Geo::IATA version 0.0.3
 
+Airport codes where taken from wikipedia 2009-06-20.
+http://en.wikipedia.org/wiki/List_of_airports_by_IATA_code
 
 =head1 SYNOPSIS
 
@@ -156,20 +158,10 @@ select * from table where <field> like <arg>
 
 [{iata => IATA,icao => ICAO, airport => AIRPORT,location => LOCATION}]
 
-=head2 iata2icao
+=head2 (iata|icao|airport|location)2(iata|icao|airport|location)
 
-=head2 icao2iata
-
-=head2 iata2airport
-
-=head2 icao2airport
-
-=head2 iata2location
-
-=head2 icao2location
-
-Simple mapping methods. Warning some iata codes have no mapping to icao code in wikipedia.
-
+Simple from2to mapping methods. On multiple matches the first one is taken.
+Warning some iata codes have no mapping to icao code in wikipedia.
 
 =cut
 
@@ -184,6 +176,14 @@ The module uses AUTOLOAD to call above queries.
 Closes internal dbi connection to sqlite db.
 
 =cut
+
+=head1 UPDATE AIRPORT CODES
+
+
+You can manually update the airport codes from wikipedia with the script
+
+create/iata_wikipedia.pl
+
 
 =head1 BUGS AND LIMITATIONS
 
@@ -209,6 +209,9 @@ Copyright (c) 2009, Joerg Meltzer C<< <joerg <at> joergmeltzer.de> >>. All right
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
+
+Airport data is provided by wikipedia.
+http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
 
 
 =head1 DISCLAIMER OF WARRANTY

@@ -4,7 +4,7 @@ use DBI;
 use WWW::Mechanize;
 use HTML::TableExtract;
 
-my $dbh = DBI->connect( "dbi:SQLite:iata.db", "", "", { RaiseError => 1, AutoCommit => 0 } );
+my $dbh = DBI->connect( "dbi:SQLite:iata_sqlite.db", "", "", { RaiseError => 1, AutoCommit => 0 } );
 
 eval {
    $dbh->do(q{DROP TABLE iata});
