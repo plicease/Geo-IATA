@@ -22,7 +22,7 @@ sub new {
        $db =~s{::}{/}gxms;
        $db =~s{$}{.pm}xms;
        ($path = $INC{$db}) =~ s{.pm$}{}xms;
-       $path="iata_sqlite.db";
+       $path = File::Spec->catfile($path, "iata_sqlite.db");
 
     }
     my $dbh = DBI->connect("dbi:SQLite:dbname=$path","","", {RaiseError => 1, sqlite_unicode=> 1});
