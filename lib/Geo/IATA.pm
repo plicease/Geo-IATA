@@ -93,6 +93,8 @@ return shift->{dbh};
 1; # Magic true value required at end of module
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
 Geo::IATA - Search airports by iata, icao codes
