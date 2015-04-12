@@ -25,7 +25,7 @@ sub new {
        $path="iata_sqlite.db";
 
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=$path","","", {RaiseError => 1, unicode=> 1});
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$path","","", {RaiseError => 1, sqlite_unicode=> 1});
 return bless {dbh => $dbh, dbname => $path}, $pkg;
 }
 
