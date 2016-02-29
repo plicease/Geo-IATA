@@ -3,6 +3,10 @@ use strict;
 use DBI;
 use WWW::Mechanize;
 use HTML::TableExtract;
+use Path::Class qw( file );
+use File::chdir;
+
+$CWD = file(__FILE__)->parent->parent->subdir('share');
 
 my $dbh = DBI->connect( "dbi:SQLite:iata_sqlite.db", "", "", { RaiseError => 1, AutoCommit => 0 } );
 
@@ -12,7 +16,7 @@ eval {
 };
 
 eval {
-   $dbh->do(q{CREATE TABLE iata(iata text,icao text,airport text, location text,primary key(iata))});
+   $dbh->do(q{CREATE TABLE iata(iata text unique,icao text unique,airport text, location text,primary key(iata))});
    1;
 } or do {
     warn "can't create table iata\n";
@@ -32,7 +36,7 @@ for my $letter ( "A" .. "Z" ) {
             $sth->execute( @$row );
         }
     }
-    sleep 3; # we are bad enough faking agent alias
+    #sleep 3; # we are bad enough faking agent alias
 }
 $sth->finish();
 eval {

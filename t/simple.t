@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More tests => 6;                      # last test to print
 use Geo::IATA;
-my $iata=Geo::IATA->new("lib/Geo/IATA/iata_sqlite.db");
+my $iata=Geo::IATA->new("share/iata_sqlite.db");
 is($iata->iata2icao("SXF"),'EDDB', "SXF => EDDB iata2icao");
 is($iata->icao2iata("EDDB"),'SXF', "EDDB => SXF icao2iata");
 like($iata->icao2airport("EDDB"),qr{Berlin}, "EDDB => Schoenefeld");

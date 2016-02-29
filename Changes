@@ -1,10 +1,12 @@
-Revision history for Geo-IATA
+Revision history for {{$dist->name}}
 
-0.0.3  Sat Jun 27 14:04:40 2009
-       added short lookups for airport and location 
-       added wikipedia license stuff
-       fixed developer tests (Test::Perl::Critic)
+{{$NEXT}}
 
-0.0.1  Sun Jun 21 12:04:40 2009
-       Initial release.
+0.0.3  2009-06-27 14:04:40 +0100
+  - added short lookups for airport and location 
+  - added wikipedia license stuff
+  - fixed developer tests (Test::Perl::Critic)
+
+0.0.1  2009-06-21 12:04:40 +0100
+  - Initial release.
 
